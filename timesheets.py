@@ -149,8 +149,14 @@ commands:
 	else:
 		PASSWD = getpass.getpass('Password: ')
 
+	# Set the correct URL for the action selected
+	if args.COMMAND == 'approve':
+		plato_url = 'https://plato.tamu.edu/Approval/'
+	else:
+		plato_url = 'https://plato.tamu.edu/timeentry.asp'
+
 	# Create the web automator object
-	web = WebDriver.AuthenticatedWeb("https://plato.tamu.edu/Approval/", log_level=LOG_LEVEL)
+	web = WebDriver.AuthenticatedWeb(plato_url, log_level=LOG_LEVEL)
 	print("Waiting for Duo 2FA...")
 	web.authenticate(NETID, PASSWD)
 
