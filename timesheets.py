@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import subprocess
 import argparse
@@ -116,7 +117,6 @@ commands:
 	parser.add_argument('-p', dest='PASSWORD', default=None, help='Use the supplied value for the password')
 	parser.add_argument('-v', '--verbose', dest='VERBOSE', action='count', help='Output extra info (more -v\'s = more info)')
 	parser.add_argument('-t', '--test', dest='TEST_MODE', action='store_true', help='Run in test mode (no changes are made)')
-	parser.add_argument('-c', '--chrome', dest='CHROME_PATH', help='Specify path to Chrome (default: "/Applications/Google Chrome.app/"')
 	args = parser.parse_args()
 
 	if not args.COMMAND or not args.COMMAND in CMD_LIST:
@@ -150,11 +150,16 @@ commands:
 	else:
 		PASSWD = getpass.getpass('Password: ')
 
-	# Check for a custom Chrome path, or use the default
-	if args.CHROME_PATH:
-		CHROME_PATH = args.CHROME_PATH + 'Contents/MacOS/Google Chrome'
+	# Check for environment variables for paths
+	if os.getenv('CHROME_PATH'):
+		CHROME_PATH = os.getenv('CHROME_PATH')
 	else:
 		CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+	if os.getenv('DRIVER_PATH'):
+		DRIVER_PATH = os.getenv('DRIVER_PATH')
+	else:
+		DRIVER_PATH = "bin/chromedriver"
 
 	# Set the correct URL for the action selected
 	if args.COMMAND == 'approve':
@@ -163,7 +168,7 @@ commands:
 		plato_url = 'https://plato.tamu.edu/timeentry.asp'
 
 	# Create the web automator object
-	web = WebDriver.AuthenticatedWeb(plato_url, log_level=LOG_LEVEL, chrome_path=CHROME_PATH)
+	web = WebDriver.AuthenticatedWeb(plato_url, log_level=LOG_LEVEL, chrome_path=CHROME_PATH, chrome_driver=DRIVER_PATH)
 	print("Waiting for Duo 2FA...")
 	web.authenticate(NETID, PASSWD)
 
